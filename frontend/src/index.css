@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --text-primary: #0f172a;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+  }
+
+  .dark {
+    --bg-main: #0b1120;
+    --text-primary: #f8fafc;
+    --card-bg: #131c31;
+    --card-border: #1e293b;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* ============================================================
+   ROOT WIDTH FIX
+   Ensure html, body and #root all expand to fill the browser
+   viewport. Without this, browsers may collapse the root
+   element and cause everything to render "tiny".
+   ============================================================ */
+html {
+  width: 100%;
+  min-height: 100%;
+  font-size: 16px; /* Prevent browser default font-size shrink */
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  min-width: 320px; /* Prevent layout collapse on very small screens */
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

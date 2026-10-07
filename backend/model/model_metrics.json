@@ -1,0 +1,54 @@
+{
+  "algorithm": "Gradient Boosting Regressor",
+  "dataset": "Medical Cost Personal Datasets (1,338 records)",
+  "target": "charges (Annual Medical Insurance Cost in USD)",
+  "features": [
+    "age",
+    "sex",
+    "bmi",
+    "children",
+    "smoker",
+    "region"
+  ],
+  "metrics": {
+    "r2": 0.8809,
+    "mae": 2405.1,
+    "rmse": 4300.36
+  },
+  "comparison": {
+    "Linear Regression": {
+      "mae": 4181.19,
+      "rmse": 5796.28,
+      "r2": 0.7836
+    },
+    "Random Forest Regressor": {
+      "mae": 2540.35,
+      "rmse": 4461.07,
+      "r2": 0.8718
+    },
+    "Gradient Boosting Regressor": {
+      "mae": 2405.1,
+      "rmse": 4300.36,
+      "r2": 0.8809
+    }
+  },
+  "feature_importance_percent": {
+    "smoker": 68.1,
+    "bmi": 18.6,
+    "age": 11.8,
+    "children": 1.0,
+    "region": 0.4,
+    "sex": 0.1
+  },
+  "total_samples": 1338,
+  "train_samples": 1070,
+  "test_samples": 268,
+  "summary_statistics": {
+    "average_cost": 13270.42,
+    "median_cost": 9382.03,
+    "min_cost": 1121.87,
+    "max_cost": 63770.43,
+    "avg_age": 39.2,
+    "avg_bmi": 30.7
+  }
+}
