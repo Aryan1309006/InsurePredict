@@ -11,7 +11,7 @@ import {
   Info
 } from 'lucide-react';
 import { apiService } from '../services/api';
-import { historyStorage } from '../services/historyStorage';
+
 
 export default function Predictor({ setLastResult }) {
   const navigate = useNavigate();
@@ -90,8 +90,18 @@ export default function Predictor({ setLastResult }) {
 
       const result = await apiService.predictCost(payload);
 
-      // Save to local prediction history
-      const savedEntry = historyStorage.savePrediction(result, payload);
+      const savedEntry = {
+        age: payload.age,
+        sex: payload.sex,
+        bmi: payload.bmi,
+        children: payload.children,
+        smoker: payload.smoker,
+        region: payload.region,
+        estimatedCost: Math.round(result.predicted_cost),
+        monthlyCost: Math.round(result.monthly_cost),
+        factors: result.factors,
+        confidence_label: result.confidence_label,
+      };
 
       if (setLastResult) {
         setLastResult({

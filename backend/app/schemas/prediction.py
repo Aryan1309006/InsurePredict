@@ -1,5 +1,7 @@
 from typing import Literal, Dict, Any, Optional, List
+from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
+
 
 
 class PredictionInput(BaseModel):
@@ -74,3 +76,32 @@ class WhatIfScenario(BaseModel):
 class WhatIfResponse(BaseModel):
     base_cost: float
     scenarios: List[WhatIfScenario]
+
+
+class PredictionRecordResponse(BaseModel):
+    id: str
+    age: int
+    sex: str
+    bmi: float
+    children: int
+    smoker: str
+    region: str
+    predicted_cost: float
+    monthly_cost: float
+    confidence_label: str = "Model Estimate"
+    created_at: datetime
+    timestamp: Optional[int] = None
+    factors: Optional[Dict[str, FactorDetail]] = None
+
+
+class PredictionHistoryListResponse(BaseModel):
+    predictions: List[PredictionRecordResponse]
+    total: int
+
+
+class DashboardStatsResponse(BaseModel):
+    total_predictions: int
+    average_cost: float
+    latest_cost: float
+    latest_prediction: Optional[PredictionRecordResponse] = None
+

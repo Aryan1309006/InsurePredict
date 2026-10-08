@@ -4,53 +4,39 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const client = axios.create({
   baseURL: API_BASE,
-  timeout: 10000,
+  timeout: 15000,
+  withCredentials: true, // Enables sending and receiving HttpOnly cookies
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+function formatErrorMessage(error, defaultMessage = 'An unexpected error occurred.') {
+  if (error.response) {
+    const errorDetail = error.response.data?.detail || error.response.data?.message;
+    if (Array.isArray(errorDetail)) {
+      // Pydantic validation error array
+      return errorDetail.map((err) => `${err.loc?.slice(-1)[0] || 'field'}: ${err.msg}`).join(', ');
+    }
+    if (typeof errorDetail === 'string') {
+      return errorDetail;
+    }
+    return defaultMessage;
+  } else if (error.request) {
+    return 'Unable to reach the server. Please check your network connection or verify that the backend is running.';
+  }
+  return error.message || defaultMessage;
+}
+
 export const apiService = {
+  // System / Model
   async checkHealth() {
     try {
       const response = await client.get('/api/health');
       return response.data;
     } catch (error) {
       console.warn('Backend health check failed:', error);
-      throw error;
-    }
-  },
-
-  async predictCost(payload) {
-    try {
-      const response = await client.post('/api/predict', payload);
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        const errorDetail = error.response.data?.detail || error.response.data?.message;
-        if (Array.isArray(errorDetail)) {
-          // Pydantic validation error array
-          const messages = errorDetail.map((err) => `${err.loc?.join(' -> ')}: ${err.msg}`).join(', ');
-          throw new Error(`Validation failed: ${messages}`);
-        }
-        throw new Error(errorDetail || 'Server rejected the calculation request.');
-      } else if (error.request) {
-        throw new Error(
-          'Unable to reach backend server. Please make sure the FastAPI server is running on http://localhost:8000 and try again.'
-        );
-      } else {
-        throw new Error(error.message || 'An unexpected error occurred while predicting cost.');
-      }
-    }
-  },
-
-  async getWhatIf(payload) {
-    try {
-      const response = await client.post('/api/what-if', payload);
-      return response.data;
-    } catch (error) {
-      console.warn('What-If simulation API failed:', error);
-      throw error;
+      throw new Error(formatErrorMessage(error, 'Health check failed.'));
     }
   },
 
@@ -60,7 +46,109 @@ export const apiService = {
       return response.data;
     } catch (error) {
       console.warn('Failed to fetch model info:', error);
-      throw error;
+      throw new Error(formatErrorMessage(error, 'Failed to fetch model specifications.'));
+    }
+  },
+
+  // Authentication
+  async register({ name, email, password, confirm_password }) {
+    try {
+      const response = await client.post('/api/auth/register', {
+        name,
+        email,
+        password,
+        confirm_password,
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Registration failed.'));
+    }
+  },
+
+  async login({ email, password }) {
+    try {
+      const response = await client.post('/api/auth/login', {
+        email,
+        password,
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Login failed.'));
+    }
+  },
+
+  async logout() {
+    try {
+      const response = await client.post('/api/auth/logout');
+      return response.data;
+    } catch (error) {
+      console.warn('Logout error:', error);
+      return { message: 'Logged out.' };
+    }
+  },
+
+  async getMe() {
+    try {
+      const response = await client.get('/api/auth/me');
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Session expired or invalid.'));
+    }
+  },
+
+  // Predictions (Authenticated)
+  async predictCost(payload) {
+    try {
+      const response = await client.post('/api/predict', payload);
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Failed to generate prediction.'));
+    }
+  },
+
+  async getWhatIf(payload) {
+    try {
+      const response = await client.post('/api/what-if', payload);
+      return response.data;
+    } catch (error) {
+      console.warn('What-If simulation API failed:', error);
+      throw new Error(formatErrorMessage(error, 'Failed to calculate simulations.'));
+    }
+  },
+
+  async getPredictions() {
+    try {
+      const response = await client.get('/api/predictions');
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Failed to fetch prediction history.'));
+    }
+  },
+
+  async getStats() {
+    try {
+      const response = await client.get('/api/predictions/stats');
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Failed to load dashboard metrics.'));
+    }
+  },
+
+  async deletePrediction(id) {
+    try {
+      const response = await client.delete(`/api/predictions/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Failed to delete prediction record.'));
+    }
+  },
+
+  async clearPredictions() {
+    try {
+      const response = await client.delete('/api/predictions');
+      return response.data;
+    } catch (error) {
+      throw new Error(formatErrorMessage(error, 'Failed to clear prediction history.'));
     }
   },
 };

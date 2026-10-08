@@ -1,19 +1,44 @@
 # InsurePredict — AI-Powered Health Insurance Cost Predictor
 
-> **Tagline:** AI-Powered Health Insurance Cost Predictor  
-> A full-stack, production-quality application built with **React**, **FastAPI**, and **Machine Learning** that predicts annual health insurance premiums based on individual demographics and lifestyle factors.
+> **Tagline:** AI-Powered Health Insurance Cost Predictor with Secure Authentication and MongoDB Atlas  
+> A full-stack, production-quality application built with **React**, **FastAPI**, **Machine Learning**, and **MongoDB Atlas** that predicts health insurance premiums and tracks personalized calculation history securely.
 
 ---
 
-## 📸 Overview & Design Reference
+## 📸 Architecture & Authentication Flow
 
-InsurePredict faithfully implements the clean healthcare aesthetic and dashboard structure from the reference design:
+```text
+User opens InsurePredict
+        ↓
+Landing Page / Public Info
+        ↓
+Login / Sign Up
+        ↓
+Argon2 Hash + JWT HttpOnly Session Cookie
+        ↓
+Authenticated User
+        ↓
+User Dashboard
+        ↓
+ML Predictor
+        ↓
+Prediction Calculated & Saved to MongoDB Atlas
+        ↓
+User-Specific Prediction History & Statistics
+```
 
-1. **Home / Landing Page** — Healthcare hero section with interactive 3D shield illustration, feature benefit cards, and key input feature highlights.
-2. **Predictor Page** — Form with numeric inputs, range sliders, segmented toggles (Sex, Smoker), dropdowns (Children, Region), and input validation.
-3. **Result View** — Annual cost estimate display, monthly breakdown, model confidence badge, prediction factor visualizer, comparative distribution chart, and an interactive **What-If Scenario Simulator**.
-4. **Dashboard & History** — Dynamic analytics dashboard with live aggregate statistics (Total Predictions, Avg. Annual Cost, Last Prediction), recent predictions table with search and filters, factor distribution donut chart, and model performance metrics.
-5. **Model Specs (About)** — Live benchmark comparisons, train/test split details, R² / MAE / RMSE evaluation metrics, and preprocessing pipeline architecture.
+Unauthenticated users can view:
+- Public Landing Page (`/`)
+- Methodology & Model Specifications (`/about`)
+- Sign Up (`/signup`)
+- Login (`/login`)
+
+Protected pages (requiring secure authentication):
+- Predictor (`/predictor`)
+- Prediction Results (`/result`)
+- Personal Prediction History (`/history`)
+- Dashboard (`/dashboard`)
+- User Profile (`/profile`)
 
 ---
 
@@ -21,72 +46,89 @@ InsurePredict faithfully implements the clean healthcare aesthetic and dashboard
 
 ### Frontend
 - **Framework:** React 19 + Vite
-- **Styling:** Tailwind CSS (with persistent Light / Dark mode support)
-- **Routing:** React Router v7
-- **HTTP Client:** Axios (with timeout, error handling, and backend offline detection)
-- **Data Visualization:** Recharts (Donut chart, comparative bar chart)
+- **Styling:** Tailwind CSS (Healthcare SaaS aesthetic, Light / Dark theme)
+- **Routing:** React Router v7 with `ProtectedRoute` guards
+- **Authentication:** `AuthContext` + session restoration via HttpOnly cookies (`withCredentials: true`)
+- **HTTP Client:** Axios with structured error mapping and loading states
+- **Data Visualization:** Recharts (Dynamic donut charts, comparative graphs)
 - **Icons:** Lucide React
 
 ### Backend & Machine Learning
 - **API Framework:** FastAPI + Uvicorn
+- **Database:** MongoDB Atlas (via `pymongo[srv]`)
+- **Password Security:** Argon2 password hashing (`argon2-cffi`)
+- **Authentication:** JWT tokens (`PyJWT`) stored in secure, HttpOnly cookies
 - **Validation:** Pydantic v2
 - **Data Science:** Pandas, NumPy, Scikit-Learn
 - **Model Serialization:** Joblib
 - **Machine Learning Pipeline:**
-  - Evaluates **Linear Regression**, **Random Forest Regressor**, and **Gradient Boosting Regressor**
-  - Feature transformation with `ColumnTransformer` (`StandardScaler` for numeric features, `OneHotEncoder` for categoricals)
-  - Automatically selects the highest-scoring model (`R² = 0.8809`, `MAE = $2,405.10`)
-  - Persists the trained pipeline and real metadata/feature importances
+  - Evaluates Linear Regression, Random Forest Regressor, and Gradient Boosting Regressor
+  - Feature transformation with `ColumnTransformer` (`StandardScaler` and `OneHotEncoder`)
+  - Automatically loads best model (`R² = 0.8809`, `MAE = $2,405.10`)
 
 ---
 
 ## 📁 Project Structure
 
-```
-insurepredict/
-│
+```text
+InsurePredict/
 ├── frontend/
-│   ├── public/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx          # Header with navigation, theme toggle & avatar
-│   │   │   ├── Footer.jsx          # Legal underwriting disclaimer & quick links
-│   │   │   └── HeroGraphic.jsx     # 3D medical shield & stethoscope SVG illustration
+│   │   │   ├── Navbar.jsx          # Auth-aware navbar (Login/SignUp vs User/Logout)
+│   │   │   ├── Footer.jsx          # Healthcare disclaimer & links
+│   │   │   ├── HeroGraphic.jsx     # 3D medical shield illustration
+│   │   │   └── ProtectedRoute.jsx  # Route guard with session verification
 │   │   ├── context/
-│   │   │   └── ThemeContext.jsx    # Persistent dark/light theme provider
+│   │   │   ├── AuthContext.jsx     # User state, login, register, logout, session refresh
+│   │   │   └── ThemeContext.jsx    # Dark/light theme provider
 │   │   ├── pages/
-│   │   │   ├── Home.jsx            # Landing page (Panel 1)
-│   │   │   ├── Predictor.jsx       # Interactive form & validation (Panel 2)
-│   │   │   ├── Result.jsx          # Prediction card, factors & What-If simulator (Panel 3)
-│   │   │   ├── History.jsx         # Analytics dashboard & history log (Panel 4)
+│   │   │   ├── Home.jsx            # Landing page
+│   │   │   ├── Login.jsx           # Clean Login page with validation & loading states
+│   │   │   ├── SignUp.jsx          # Sign Up page (Name, Email, Password, Confirm Password)
+│   │   │   ├── Dashboard.jsx       # User dashboard with live MongoDB statistics
+│   │   │   ├── Predictor.jsx       # Interactive form sending authenticated ML predictions
+│   │   │   ├── Result.jsx          # Prediction breakdown & What-If scenario simulations
+│   │   │   ├── History.jsx         # User-specific prediction history with deletion
+│   │   │   ├── Profile.jsx         # User account details and metrics
 │   │   │   └── About.jsx           # Model specs, architecture & benchmark report
 │   │   ├── services/
-│   │   │   ├── api.js              # Axios service connected to FastAPI
-│   │   │   └── historyStorage.js   # LocalStorage history manager & stats aggregator
-│   │   ├── App.jsx                 # Main application routes
-│   │   ├── index.css               # Tailwind directives & CSS variables
-│   │   └── main.jsx                # Application root
+│   │   │   └── api.js              # Axios service configured with credentials & endpoints
+│   │   ├── App.jsx                 # Routes with ProtectedRoute wrappers
+│   │   └── main.jsx
 │   ├── package.json
-│   ├── tailwind.config.js
 │   └── vite.config.js
 │
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                 # FastAPI app entry with CORS & error handlers
+│   │   ├── config.py               # Environment configuration (.env loader)
+│   │   ├── database/
+│   │   │   └── mongodb.py          # MongoDB client, connection pooling & indexes
+│   │   ├── dependencies/
+│   │   │   └── auth.py             # get_current_user dependency (Cookie / Bearer)
+│   │   ├── routes/
+│   │   │   ├── api.py              # Main API router mounting sub-routers
+│   │   │   ├── auth.py             # /api/auth/register, login, logout, me
+│   │   │   └── prediction.py       # /api/predict, /api/predictions, /api/predictions/stats
 │   │   ├── schemas/
-│   │   │   └── prediction.py       # Pydantic schemas for input validation & responses
+│   │   │   ├── auth.py             # RegisterRequest, LoginRequest, UserResponse
+│   │   │   └── prediction.py       # Prediction schemas, history items, and stats
 │   │   ├── services/
-│   │   │   └── model_service.py    # Singleton model loader, predictor & what-if engine
-│   │   └── routes/
-│   │       └── api.py              # API routes (/predict, /what-if, /model-info, /health)
+│   │   │   └── model_service.py    # Singleton model inference engine
+│   │   ├── utils/
+│   │   │   └── security.py         # Argon2 hashing & PyJWT token utilities
+│   │   └── main.py                 # FastAPI application, CORS & exception handling
 │   ├── data/
-│   │   └── insurance.csv           # Benchmark medical costs dataset (1,338 records)
+│   │   └── insurance.csv           # Benchmark training dataset (1,338 records)
 │   ├── model/
 │   │   ├── insurance_model.joblib  # Trained scikit-learn pipeline
 │   │   └── model_metrics.json      # Genuine evaluation scores & feature importances
 │   ├── training/
-│   │   └── train_model.py          # Machine learning training & evaluation script
-│   └── requirements.txt            # Python dependencies
+│   │   └── train_model.py          # ML training script
+│   ├── test_auth_mongodb.py        # Automated test suite for auth & user isolation
+│   ├── requirements.txt            # Python dependencies
+│   ├── .env.example                # Template for environment configuration
+│   └── .env                        # Local environment variables (gitignored)
 │
 ├── .gitignore
 └── README.md
@@ -94,47 +136,92 @@ insurepredict/
 
 ---
 
-## 🚀 Getting Started
+## ☁️ MongoDB Atlas Setup Guide
 
-### Prerequisites
-- **Python 3.10+** (tested on Python 3.13)
-- **Node.js 18+** and **npm**
+Follow these steps to connect your MongoDB Atlas cloud database:
+
+### 1. Create a MongoDB Atlas Account
+- Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up for a free account.
+
+### 2. Create a Cluster
+- Create a new project (e.g. `InsurePredict`).
+- Select **Deploy a database** and choose the **M0 Free Shared Cluster**.
+- Choose your preferred cloud provider and region closest to your users, then click **Create Deployment**.
+
+### 3. Create a Database User
+- In the Security Quickstart (or under **Security > Database Access**):
+  - Choose **Username and Password** authentication.
+  - Set a username (e.g. `insure_user`).
+  - Set a strong password (copy this password for your connection string).
+  - Assign the user role `Read and write to any database`.
+
+### 4. Configure Network Access (IP Access List)
+- Under **Security > Network Access**:
+  - Click **Add IP Address**.
+  - For development, choose **Allow Access From Anywhere** (`0.0.0.0/0`) or enter your current IP address.
+  - Click **Confirm**.
+
+### 5. Get Your MongoDB Connection String
+- Under **Databases**, click **Connect** on your cluster.
+- Choose **Drivers** (Driver: `Python`, Version: `3.12 or later`).
+- Copy the provided connection string URI. It looks like:
+  ```text
+  mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
+  ```
+
+### 6. Configure Backend `.env`
+In the `backend/` directory, create or edit `.env` (never commit this file to git):
+
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
+DATABASE_NAME=insurepredict
+JWT_SECRET=your_long_random_secret_key_here_minimum_32_characters
+JWT_EXPIRE_MINUTES=1440
+FRONTEND_URL=http://localhost:5173
+ENVIRONMENT=development
+```
+
+*(Replace `<username>` and `<password>` with your database user credentials. Do not share or commit these credentials).*
 
 ---
 
-### 1. Backend Setup & Model Training
+## 🚀 Running the Application
 
-Open a terminal and navigate to the backend folder:
+### 1. Start the FastAPI Backend
 
 ```bash
 cd backend
 
-# Install Python dependencies
+# (Optional) Activate your virtual environment:
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Run the ML training pipeline (loads data, trains 3 models, exports best model & metrics)
-python training/train_model.py
+# Run the automated verification test suite
+python test_auth_mongodb.py
 
 # Start the FastAPI server
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-The FastAPI backend will be running at `http://127.0.0.1:8000`.  
-Interactive Swagger docs are available at `http://127.0.0.1:8000/docs`.
+The API will be running at `http://127.0.0.1:8000`.  
+Interactive documentation is available at `http://127.0.0.1:8000/docs`.
 
----
+### 2. Start the React Frontend
 
-### 2. Frontend Setup
-
-In a new terminal window, navigate to the frontend folder:
+In another terminal window:
 
 ```bash
 cd frontend
 
-# Install npm packages
+# Install dependencies
 npm install
 
-# Start the Vite development server
+# Start development server
 npm run dev
 ```
 
@@ -144,77 +231,31 @@ Open `http://localhost:5173` in your browser.
 
 ## 📡 API Endpoints
 
-### 1. Health Check
-`GET /api/health`
-```json
-{
-  "status": "ok"
-}
-```
+### Authentication Endpoints
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/api/auth/register` | Register new user, hashes password with Argon2, sets session cookie | No |
+| `POST` | `/api/auth/login` | Verify credentials, sets HttpOnly JWT session cookie | No |
+| `POST` | `/api/auth/logout` | Clears authentication session cookie | No |
+| `GET` | `/api/auth/me` | Returns current user profile and prediction counts | **Yes** |
 
-### 2. Calculate Prediction
-`POST /api/predict`
-
-**Request Body:**
-```json
-{
-  "age": 32,
-  "sex": "male",
-  "bmi": 26.4,
-  "children": 2,
-  "smoker": "no",
-  "region": "southeast"
-}
-```
-
-**Response:**
-```json
-{
-  "predicted_cost": 6552.77,
-  "monthly_cost": 546.06,
-  "confidence_label": "Model Estimate",
-  "model_algorithm": "Gradient Boosting Regressor",
-  "factors": {
-    "age": { "value": 32, "display": "32 yrs", "impact_level": "Low", "feature_importance_pct": 11.8 },
-    "bmi": { "value": 26.4, "display": "26.4", "impact_level": "Moderate", "feature_importance_pct": 18.6 },
-    "smoking": { "value": "No", "display": "No", "impact_level": "Low", "feature_importance_pct": 68.1 },
-    "children": { "value": 2, "display": "2", "impact_level": "Low", "feature_importance_pct": 1.0 },
-    "region": { "value": "Southeast", "display": "Southeast", "impact_level": "Minimal", "feature_importance_pct": 0.4 }
-  },
-  "disclaimer": "This tool provides an estimated insurance cost for educational/demo purposes..."
-}
-```
-
-### 3. What-If Scenarios
-`POST /api/what-if`  
-Runs multiple model inferences with perturbation of critical lifestyle variables (Smoking status, BMI adjustment to normal weight, and 5-year age progression), returning the exact cost delta and percent difference.
-
-### 4. Model Metadata & Metrics
-`GET /api/model-info`  
-Returns the actual metrics computed during model training (`R² = 0.8809`, `MAE = $2,405.10`, `RMSE = $4,300.36`), model comparison rankings, and feature importances.
+### Prediction & History Endpoints
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/api/predict` | Runs ML inference and persists record under user account in MongoDB | **Yes** |
+| `GET` | `/api/predictions` | Retrieves strictly the authenticated user's prediction history | **Yes** |
+| `GET` | `/api/predictions/stats` | Computes user-specific dashboard metrics from MongoDB | **Yes** |
+| `DELETE` | `/api/predictions/{id}` | Deletes a prediction after verifying user ownership | **Yes** |
+| `DELETE` | `/api/predictions` | Clears all predictions belonging to authenticated user | **Yes** |
+| `POST` | `/api/what-if` | Runs lifestyle factor perturbation simulations | No |
+| `GET` | `/api/model-info` | Returns model performance metrics and algorithm benchmarks | No |
+| `GET` | `/api/health` | Health check endpoint | No |
 
 ---
 
-## 🧠 Machine Learning Details
+## 🔒 Security Highlights
 
-The model was trained on the standard Brett Lantz **Medical Cost Personal Dataset** (1,338 records).
-
-| Algorithm | R² Score | MAE | RMSE | Status |
-| :--- | :---: | :---: | :---: | :---: |
-| **Gradient Boosting Regressor** | **0.8809** | **$2,405.10** | **$4,300.36** | **Selected (Best)** |
-| Random Forest Regressor | 0.8718 | $2,540.35 | $4,461.07 | Benchmarked |
-| Linear Regression | 0.7836 | $4,181.19 | $5,796.28 | Baseline |
-
-### Feature Importance Breakdown:
-- **Smoker:** 68.1% (Primary driver of cost variance)
-- **BMI:** 18.6% (Secondary driver, exponential scaling above 30.0)
-- **Age:** 11.8% (Linear increase with age)
-- **Children:** 1.0%
-- **Region:** 0.4%
-- **Sex:** 0.1%
-
----
-
-## 🔒 Privacy & Legal Disclaimer
-
-This application is an educational and portfolio demonstration. It does not collect or transmit Personally Identifiable Information (PII) such as names, social security numbers, medical records, or addresses. Predictions are statistical regression estimates and do not represent guaranteed insurance premiums or legally binding underwriting quotes.
+- **Password Hashing:** Passwords are never stored as plain text. Secured using **Argon2** (winner of the Password Hashing Competition).
+- **Session Security:** JWT tokens are transported in **HttpOnly**, SameSite cookies to mitigate XSS exposure.
+- **Data Isolation:** User ID is derived exclusively from the verified server-side session token. Users can never query or delete another user's records.
+- **Environment Isolation:** Secrets and database URIs are loaded exclusively from `.env` and kept out of version control.
