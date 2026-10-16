@@ -1,5 +1,6 @@
 import logging
-from typing import Optional
+import re
+from typing import Optional, Any
 from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from pymongo.database import Database
@@ -8,14 +9,28 @@ from app.config import settings
 
 logger = logging.getLogger("insurepredict.database")
 
+
+def _sanitize_error(err: Any) -> str:
+    """Sanitize database error messages to prevent leaking connection credentials."""
+    text = str(err)
+    # Redact username:password from mongodb URIs if present in error message
+    return re.sub(r"://([^:@]+):([^@]+)@", r"://\1:****@", text)
+
+
 class MongoDBManager:
     _client: Optional[MongoClient] = None
     _db: Optional[Database] = None
+    _is_connected: bool = False
+
+    @classmethod
+    def is_connected(cls) -> bool:
+        return cls._is_connected
 
     @classmethod
     def get_client(cls) -> MongoClient:
         if cls._client is None:
             if not settings.MONGODB_URI:
+                cls._is_connected = False
                 raise ConnectionFailure("MONGODB_URI is not configured in environment variables.")
             try:
                 # 5 second timeout for server selection
@@ -27,8 +42,10 @@ class MongoDBManager:
                     appname="InsurePredict"
                 )
             except Exception as e:
-                logger.error(f"Failed to initialize MongoClient: {e}")
-                raise ConnectionFailure(f"Could not initialize MongoDB client: {str(e)}")
+                cls._is_connected = False
+                safe_msg = _sanitize_error(e)
+                logger.error(f"Failed to initialize MongoClient: {safe_msg}")
+                raise ConnectionFailure(f"Could not initialize MongoDB client: {safe_msg}")
         return cls._client
 
     @classmethod
@@ -40,12 +57,18 @@ class MongoDBManager:
 
     @classmethod
     def ping(cls) -> bool:
+        if not settings.MONGODB_URI:
+            cls._is_connected = False
+            return False
         try:
             client = cls.get_client()
             client.admin.command("ping")
+            cls._is_connected = True
             return True
         except Exception as e:
-            logger.warning(f"MongoDB ping failed: {e}")
+            cls._is_connected = False
+            safe_msg = _sanitize_error(e)
+            logger.warning(f"MongoDB ping failed: {safe_msg}")
             return False
 
     @classmethod
