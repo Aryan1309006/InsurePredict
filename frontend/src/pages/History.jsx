@@ -456,19 +456,19 @@ export default function History() {
                       <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
                         <span className="text-[11px] text-slate-400 block font-medium">R² Score</span>
                         <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400 mt-1 block">
-                          {modelInfo?.metrics?.r2 || '0.8809'}
+                          {modelInfo?.metrics?.r2 || '0.8718'}
                         </span>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
                         <span className="text-[11px] text-slate-400 block font-medium">MAE</span>
                         <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">
-                          ${modelInfo?.metrics?.mae ? Math.round(modelInfo.metrics.mae).toLocaleString() : '2,405'}
+                          ${modelInfo?.metrics?.mae ? Math.round(modelInfo.metrics.mae).toLocaleString() : '2,540'}
                         </span>
                       </div>
                       <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
                         <span className="text-[11px] text-slate-400 block font-medium">RMSE</span>
                         <span className="text-lg font-extrabold text-purple-600 dark:text-purple-400 mt-1 block">
-                          ${modelInfo?.metrics?.rmse ? Math.round(modelInfo.metrics.rmse).toLocaleString() : '4,300'}
+                          ${modelInfo?.metrics?.rmse ? Math.round(modelInfo.metrics.rmse).toLocaleString() : '4,461'}
                         </span>
                       </div>
                     </div>
@@ -479,7 +479,7 @@ export default function History() {
                       onClick={() => setActiveTab('model')}
                       className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 transition text-center"
                     >
-                      {modelInfo?.algorithm || 'Gradient Boosting Regressor'}
+                      {modelInfo?.algorithm || 'Random Forest Regressor'}
                     </button>
                   </div>
                 </div>
@@ -619,7 +619,7 @@ export default function History() {
                   Regression Pipeline
                 </span>
                 <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                  {modelInfo?.algorithm || 'Gradient Boosting Regressor'}
+                  {modelInfo?.algorithm || 'Random Forest Regressor'}
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   Preprocessed with scikit-learn ColumnTransformer (StandardScaler for numerical features, OneHotEncoder for categoricals).

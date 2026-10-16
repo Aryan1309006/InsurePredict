@@ -53,4 +53,5 @@ class UserResponse(BaseModel):
 class AuthResponse(BaseModel):
     user: UserResponse
     message: str
+    access_token: Optional[str] = None
     token_type: str = "bearer"

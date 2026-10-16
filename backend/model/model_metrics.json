@@ -1,5 +1,5 @@
 {
-  "algorithm": "Gradient Boosting Regressor",
+  "algorithm": "Random Forest Regressor",
   "dataset": "Medical Cost Personal Datasets (1,338 records)",
   "target": "charges (Annual Medical Insurance Cost in USD)",
   "features": [
@@ -11,9 +11,9 @@
     "region"
   ],
   "metrics": {
-    "r2": 0.8809,
-    "mae": 2405.1,
-    "rmse": 4300.36
+    "r2": 0.8718,
+    "mae": 2540.35,
+    "rmse": 4461.07
   },
   "comparison": {
     "Linear Regression": {
@@ -25,19 +25,14 @@
       "mae": 2540.35,
       "rmse": 4461.07,
       "r2": 0.8718
-    },
-    "Gradient Boosting Regressor": {
-      "mae": 2405.1,
-      "rmse": 4300.36,
-      "r2": 0.8809
     }
   },
   "feature_importance_percent": {
-    "smoker": 68.1,
-    "bmi": 18.6,
-    "age": 11.8,
-    "children": 1.0,
-    "region": 0.4,
+    "smoker": 66.7,
+    "bmi": 19.0,
+    "age": 12.4,
+    "children": 1.2,
+    "region": 0.6,
     "sex": 0.1
   },
   "total_samples": 1338,

@@ -14,14 +14,24 @@ class Settings:
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
     JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "1440"))
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "production" if os.getenv("RENDER") else "development")
     
     # Cookie security settings
     COOKIE_NAME: str = "insurepredict_session"
-    COOKIE_SAMESITE: str = "lax"
+    
+    @property
+    def COOKIE_SAMESITE(self) -> str:
+        explicit = os.getenv("COOKIE_SAMESITE")
+        if explicit:
+            return explicit
+        # Cross-site cookie between Vercel and Render requires SameSite=None
+        if self.ENVIRONMENT.lower() == "production" or "vercel.app" in self.FRONTEND_URL:
+            return "none"
+        return "lax"
     
     @property
     def COOKIE_SECURE(self) -> bool:
-        return self.ENVIRONMENT.lower() == "production"
+        # SameSite=None requires Secure=True in modern browsers
+        return self.COOKIE_SAMESITE.lower() == "none" or self.ENVIRONMENT.lower() == "production"
 
 settings = Settings()

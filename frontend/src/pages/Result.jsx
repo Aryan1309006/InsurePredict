@@ -38,13 +38,13 @@ export default function Result({ lastResult }) {
     predicted_cost: 12480.50,
     monthly_cost: 1040.04,
     confidence_label: 'Model Estimate',
-    model_algorithm: 'Gradient Boosting Regressor',
+    model_algorithm: 'Random Forest Regressor',
     factors: {
-      age: { value: 32, display: '32 yrs', impact_level: 'Low', feature_importance_pct: 11.8 },
-      bmi: { value: 26.4, display: '26.4', impact_level: 'Moderate', feature_importance_pct: 18.6 },
-      smoking: { value: 'No', display: 'No', impact_level: 'Low', feature_importance_pct: 68.1 },
-      children: { value: 2, display: '2', impact_level: 'Low', feature_importance_pct: 1.0 },
-      region: { value: 'Southeast', display: 'Southeast', impact_level: 'Minimal', feature_importance_pct: 0.4 },
+      age: { value: 32, display: '32 yrs', impact_level: 'Low', feature_importance_pct: 12.4 },
+      bmi: { value: 26.4, display: '26.4', impact_level: 'Moderate', feature_importance_pct: 19.0 },
+      smoking: { value: 'No', display: 'No', impact_level: 'Low', feature_importance_pct: 66.7 },
+      children: { value: 2, display: '2', impact_level: 'Low', feature_importance_pct: 1.2 },
+      region: { value: 'Southeast', display: 'Southeast', impact_level: 'Minimal', feature_importance_pct: 0.6 },
     },
   };
 

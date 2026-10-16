@@ -62,9 +62,9 @@ Protected pages (requiring secure authentication):
 - **Data Science:** Pandas, NumPy, Scikit-Learn
 - **Model Serialization:** Joblib
 - **Machine Learning Pipeline:**
-  - Evaluates Linear Regression, Random Forest Regressor, and Gradient Boosting Regressor
+  - Evaluates Linear Regression and Random Forest Regressor
   - Feature transformation with `ColumnTransformer` (`StandardScaler` and `OneHotEncoder`)
-  - Automatically loads best model (`R² = 0.8809`, `MAE = $2,405.10`)
+  - Automatically loads best model (`Random Forest Regressor`: `R² = 0.8718`, `MAE = $2,540.35`, `RMSE = $4,461.07`)
 
 ---
 

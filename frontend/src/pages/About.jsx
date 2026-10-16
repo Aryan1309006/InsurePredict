@@ -59,7 +59,7 @@ export default function About() {
           </div>
           <span className="text-xs font-medium text-slate-400 block">Selected Algorithm</span>
           <p className="text-lg font-bold text-slate-900 dark:text-white">
-            {modelInfo?.algorithm || 'Gradient Boosting Regressor'}
+            {modelInfo?.algorithm || 'Random Forest Regressor'}
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function About() {
           </div>
           <span className="text-xs font-medium text-slate-400 block">Evaluation R²</span>
           <p className="text-lg font-bold text-slate-900 dark:text-white font-mono">
-            {modelInfo?.metrics?.r2 ? modelInfo.metrics.r2 : '0.8809'}
+            {modelInfo?.metrics?.r2 ? modelInfo.metrics.r2 : '0.8718'}
           </p>
         </div>
 

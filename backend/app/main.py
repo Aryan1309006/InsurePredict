@@ -48,20 +48,24 @@ allowed_origins = [
     "http://127.0.0.1:3000",
     "http://localhost:4173",
     "http://127.0.0.1:4173",
+    "https://insure-predict.vercel.app",
 ]
-if settings.FRONTEND_URL and settings.FRONTEND_URL not in allowed_origins:
-    allowed_origins.append(settings.FRONTEND_URL)
+if settings.FRONTEND_URL:
+    clean_frontend = settings.FRONTEND_URL.strip().rstrip("/")
+    if clean_frontend and clean_frontend not in allowed_origins:
+        allowed_origins.append(clean_frontend)
 
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
 if allowed_origins_env:
     for orig in allowed_origins_env.split(","):
-        o = orig.strip()
+        o = orig.strip().rstrip("/")
         if o and o not in allowed_origins:
             allowed_origins.append(o)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,3 +116,12 @@ def root():
         "database": "connected" if MongoDBManager.ping() else "disconnected",
         "docs_url": "/docs"
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"Starting InsurePredict API on {host}:{port}")
+    uvicorn.run("app.main:app", host=host, port=port)
+

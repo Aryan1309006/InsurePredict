@@ -11,6 +11,19 @@ const client = axios.create({
   },
 });
 
+// Interceptor to attach Bearer token if present (for cross-domain environments)
+client.interceptors.request.use((config) => {
+  try {
+    const token = localStorage.getItem('insurepredict_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (err) {
+    // LocalStorage unavailable
+  }
+  return config;
+});
+
 function formatErrorMessage(error, defaultMessage = 'An unexpected error occurred.') {
   if (error.response) {
     const errorDetail = error.response.data?.detail || error.response.data?.message;
@@ -59,6 +72,9 @@ export const apiService = {
         password,
         confirm_password,
       });
+      if (response.data?.access_token) {
+        localStorage.setItem('insurepredict_token', response.data.access_token);
+      }
       return response.data;
     } catch (error) {
       throw new Error(formatErrorMessage(error, 'Registration failed.'));
@@ -71,6 +87,9 @@ export const apiService = {
         email,
         password,
       });
+      if (response.data?.access_token) {
+        localStorage.setItem('insurepredict_token', response.data.access_token);
+      }
       return response.data;
     } catch (error) {
       throw new Error(formatErrorMessage(error, 'Login failed.'));
@@ -79,9 +98,11 @@ export const apiService = {
 
   async logout() {
     try {
+      localStorage.removeItem('insurepredict_token');
       const response = await client.post('/api/auth/logout');
       return response.data;
     } catch (error) {
+      localStorage.removeItem('insurepredict_token');
       console.warn('Logout error:', error);
       return { message: 'Logged out.' };
     }
@@ -92,6 +113,9 @@ export const apiService = {
       const response = await client.get('/api/auth/me');
       return response.data;
     } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('insurepredict_token');
+      }
       throw new Error(formatErrorMessage(error, 'Session expired or invalid.'));
     }
   },

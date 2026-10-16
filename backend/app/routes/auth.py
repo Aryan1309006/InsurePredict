@@ -107,7 +107,8 @@ def register_user(payload: RegisterRequest, response: Response):
             created_at=now,
             total_predictions=0,
         ),
-        message="Account created successfully."
+        message="Account created successfully.",
+        access_token=token,
     )
 
 
@@ -137,7 +138,8 @@ def login_user(payload: LoginRequest, response: Response):
             created_at=user.get("created_at"),
             total_predictions=total_preds,
         ),
-        message="Logged in successfully."
+        message="Logged in successfully.",
+        access_token=token,
     )
 
 

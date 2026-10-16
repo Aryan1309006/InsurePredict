@@ -35,13 +35,13 @@ class ModelService:
                 self.metrics = json.load(f)
         else:
             self.metrics = {
-                "algorithm": "Gradient Boosting Regressor",
+                "algorithm": "Random Forest Regressor",
                 "feature_importance_percent": {
-                    "smoker": 68.1,
-                    "bmi": 18.6,
-                    "age": 11.8,
-                    "children": 1.0,
-                    "region": 0.4,
+                    "smoker": 66.7,
+                    "bmi": 19.0,
+                    "age": 12.4,
+                    "children": 1.2,
+                    "region": 0.6,
                     "sex": 0.1,
                 },
             }
@@ -80,31 +80,31 @@ class ModelService:
                 value=input_data.age,
                 display=f"{input_data.age} yrs",
                 impact_level="Medium" if input_data.age > 40 else "Low",
-                feature_importance_pct=importances.get("age", 11.8),
+                feature_importance_pct=importances.get("age", 12.4),
             ),
             "bmi": FactorDetail(
                 value=input_data.bmi,
                 display=f"{input_data.bmi:.1f}",
                 impact_level="High" if input_data.bmi >= 30 else ("Moderate" if input_data.bmi >= 25 else "Normal"),
-                feature_importance_pct=importances.get("bmi", 18.6),
+                feature_importance_pct=importances.get("bmi", 19.0),
             ),
             "smoking": FactorDetail(
                 value=input_data.smoker.capitalize(),
                 display="Yes" if input_data.smoker == "yes" else "No",
                 impact_level="Critical" if input_data.smoker == "yes" else "Low",
-                feature_importance_pct=importances.get("smoker", 68.1),
+                feature_importance_pct=importances.get("smoker", 66.7),
             ),
             "children": FactorDetail(
                 value=input_data.children,
                 display=str(input_data.children),
                 impact_level="Low",
-                feature_importance_pct=importances.get("children", 1.0),
+                feature_importance_pct=importances.get("children", 1.2),
             ),
             "region": FactorDetail(
                 value=input_data.region.capitalize(),
                 display=input_data.region.capitalize(),
                 impact_level="Minimal",
-                feature_importance_pct=importances.get("region", 0.4),
+                feature_importance_pct=importances.get("region", 0.6),
             ),
             "sex": FactorDetail(
                 value=input_data.sex.capitalize(),
@@ -118,7 +118,7 @@ class ModelService:
             predicted_cost=cost_rounded,
             monthly_cost=monthly_rounded,
             confidence_label="Model Estimate",
-            model_algorithm=self.metrics.get("algorithm", "Gradient Boosting Regressor"),
+            model_algorithm=self.metrics.get("algorithm", "Random Forest Regressor"),
             factors=factors,
         )
 

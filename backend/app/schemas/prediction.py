@@ -89,6 +89,7 @@ class PredictionRecordResponse(BaseModel):
     predicted_cost: float
     monthly_cost: float
     confidence_label: str = "Model Estimate"
+    model_algorithm: Optional[str] = "Random Forest Regressor"
     created_at: datetime
     timestamp: Optional[int] = None
     factors: Optional[Dict[str, FactorDetail]] = None

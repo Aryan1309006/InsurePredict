@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
@@ -61,9 +61,6 @@ def train_and_evaluate():
         'Linear Regression': LinearRegression(),
         'Random Forest Regressor': RandomForestRegressor(
             n_estimators=150, max_depth=6, min_samples_split=4, random_state=42
-        ),
-        'Gradient Boosting Regressor': GradientBoostingRegressor(
-            n_estimators=100, learning_rate=0.08, max_depth=3, random_state=42
         )
     }
 

@@ -54,6 +54,7 @@ def predict_insurance_cost(
             "predicted_cost": result.predicted_cost,
             "monthly_cost": result.monthly_cost,
             "confidence_label": result.confidence_label,
+            "model_algorithm": result.model_algorithm,
             "factors": factors_dict,
             "created_at": now,
         }
@@ -94,6 +95,7 @@ def get_user_prediction_history(
                 predicted_cost=doc.get("predicted_cost", 0.0),
                 monthly_cost=doc.get("monthly_cost", 0.0),
                 confidence_label=doc.get("confidence_label", "Model Estimate"),
+                model_algorithm=doc.get("model_algorithm", "Random Forest Regressor"),
                 created_at=created_at or datetime.now(timezone.utc),
                 timestamp=timestamp,
                 factors=doc.get("factors"),
@@ -152,6 +154,7 @@ def get_user_dashboard_stats(
             predicted_cost=latest_doc.get("predicted_cost", 0.0),
             monthly_cost=latest_doc.get("monthly_cost", 0.0),
             confidence_label=latest_doc.get("confidence_label", "Model Estimate"),
+            model_algorithm=latest_doc.get("model_algorithm", "Random Forest Regressor"),
             created_at=created_at or datetime.now(timezone.utc),
             timestamp=timestamp,
             factors=latest_doc.get("factors"),
